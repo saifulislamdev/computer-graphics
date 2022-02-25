@@ -1,0 +1,17 @@
+.DS_Store
+.vs
+.vscode
+.xcode
+*.xcodeproj*
+*.vcxproj*
+*.app
+debug
+release
+*.db
+*.sln
+*.opendb
+*.stash
+*.plist
+Make*
+moc*.cpp
+qrc*.cpp

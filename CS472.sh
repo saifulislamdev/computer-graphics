@@ -1,0 +1,1 @@
+qmake -spec macx-clang CS472.pro && make -j4 && open CS472.app
