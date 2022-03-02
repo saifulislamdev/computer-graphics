@@ -56,6 +56,30 @@ void
 HW1b::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE HERE
+
+	m_winW = w;
+	m_winH = h;
+
+	// compute aspect ratio
+	float ar = (float) w / h;
+
+	// set xmax, ymax
+	float xmax, ymax;
+	if(ar > 1.0) {		// wide screen
+		xmax = ar;
+		ymax = 1.;
+	} else {		// tall screen
+		xmax = 1.;
+		ymax = 1/ar;
+	}
+
+	// set viewport to occupy full canvas
+	glViewport(0, 0, w, h); 
+
+	// init viewing coordinates for orthographic projection
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
 }
 
 
@@ -69,6 +93,21 @@ void
 HW1b::paintGL()
 {
 	// PUT YOUR CODE HERE
+
+	// clear canvas with background values
+	glClear(GL_COLOR_BUFFER_BIT);
+	
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glBegin(GL_TRIANGLES);
+	for (size_t i = 0; i < m_points.size(); i++) {
+		// draw each vertex
+		// for every 3 vertices drawn, there's a new triangle
+		glColor3f(m_colors[i].x(), m_colors[i].y(), m_colors[i].z());
+		glVertex2f(m_points[i].x(), m_points[i].y());
+	}
+	glEnd();
 }
 
 
@@ -206,6 +245,17 @@ void
 HW1b::divideTriangle(vec2 a, vec2 b, vec2 c, int count)
 {
 	// PUT YOUR CODE HERE
+	if (count > 0) {
+		vec2 ab = vec2((a.x() + b.x())/ 2.0, (a.y() + b.y()) / 2.0);
+		vec2 ac = vec2((a.x() + c.x()) / 2.0, (a.y() + c.y()) / 2.0);
+		vec2 bc = vec2((b.x() + c.x()) / 2.0, (b.y() + c.y()) / 2.0); 
+		divideTriangle(a, ab, ac, count - 1); 
+		divideTriangle(b, bc, ab, count - 1); 
+		divideTriangle(c, ac, bc, count - 1); 
+		divideTriangle(ab, ac, bc, count - 1); 
+	}
+	// draw triangle at end of recursion
+	else triangle(a, b, c);
 }
 
 
