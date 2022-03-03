@@ -155,7 +155,7 @@ HW1a::paintGL()
 
 			glEnd();
 		}
-
+	}
 }
 
 
