@@ -6,7 +6,7 @@
 //
 // Written by: George Wolberg, 2022
 // ===============================================================
-
+#define GL_SILENCE_DEPRECATION
 #include "HW1b.h"
 
 
@@ -16,13 +16,13 @@
 // HW1b constructor.
 //
 HW1b::HW1b(const QGLFormat &glf, QWidget *parent)
-	: HW(glf, parent)
+    : HW(glf, parent)
 {
-	// init vars
-	m_theta		= 0;
-	m_subdivisions	= 4;
-	m_updateColor	= 1;
-	m_twist		= 1;
+    // init vars
+    m_theta     = 0;
+    m_subdivisions  = 4;
+    m_updateColor   = 1;
+    m_twist     = 1;
 }
 
 
@@ -36,12 +36,12 @@ HW1b::HW1b(const QGLFormat &glf, QWidget *parent)
 void
 HW1b::initializeGL()
 {
-	// init vertex and color buffers
-	initBuffers();
+    // init vertex and color buffers
+    initBuffers();
 
-	// init state variables
-	glClearColor(0.0, 0.0, 0.0, 1.0);	// set background color
-	glColor3f   (1.0, 1.0, 1.0);		// set foreground color
+    // init state variables
+    glClearColor(0.0, 0.0, 0.0, 1.0);   // set background color
+    glColor3f   (1.0, 1.0, 1.0);        // set foreground color
 }
 
 
@@ -54,8 +54,31 @@ HW1b::initializeGL()
 //
 void
 HW1b::resizeGL(int w, int h)
+
 {
-	// PUT YOUR CODE HERE
+    // PUT YOUR CODE HERE
+    // save window dimensions
+    m_winW = w;
+    m_winH = h;
+
+    // compute aspect ratio
+    float xmax, ymax;
+    float ar = (float) w / h;
+        if(ar > 1.0) {      // wide screen
+            xmax = ar;
+            ymax = 1.;
+        } else {        // tall screen
+            xmax = 1.;
+            ymax = 1/ar;
+        }
+
+    // set viewport to occupy full canvas
+    glMatrixMode(GL_PROJECTION);
+
+    // init viewing coordinates for orthographic projection
+    glLoadIdentity();
+    glOrtho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
+
 }
 
 
@@ -68,7 +91,23 @@ HW1b::resizeGL(int w, int h)
 void
 HW1b::paintGL()
 {
-	// PUT YOUR CODE HERE
+    // PUT YOUR CODE HERE
+    // Clear canvas with background color
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    //draw traingles
+ 
+
+    for(uint i = 0,  j = 0; i < m_colors.size() && j < m_points.size(); i++, j+=3){
+        glBegin(GL_TRIANGLES);
+        glColor3f(m_colors[i].x(), m_colors[i].y(), m_colors[i].z());
+        glVertex2f(m_points[j].x(), m_points[j].y());
+        glVertex2f(m_points[j+1].x(), m_points[j+1].y());
+        glVertex2f(m_points[j+2].x(), m_points[j+2].y());
+        glEnd();
+    }
+
+
 }
 
 
@@ -81,57 +120,57 @@ HW1b::paintGL()
 QGroupBox*
 HW1b::controlPanel()
 {
-	// init group box
-	QGroupBox *groupBox = new QGroupBox("Homework 1b");
-	groupBox->setStyleSheet(GroupBoxStyle);
-	// create labels
-	QLabel *label[2];
-	label[0] = new QLabel("Theta");
-	label[1] = new QLabel("Subdivide");
+    // init group box
+    QGroupBox *groupBox = new QGroupBox("Homework 1b");
+    groupBox->setStyleSheet(GroupBoxStyle);
+    // create labels
+    QLabel *label[2];
+    label[0] = new QLabel("Theta");
+    label[1] = new QLabel("Subdivide");
 
-	// create sliders
-	m_sliderTheta  = new QSlider(Qt::Horizontal);
-	m_sliderSubdiv = new QSlider(Qt::Horizontal);
+    // create sliders
+    m_sliderTheta  = new QSlider(Qt::Horizontal);
+    m_sliderSubdiv = new QSlider(Qt::Horizontal);
 
-	// init sliders
-	m_sliderTheta ->setRange(0, 360);
-	m_sliderTheta ->setValue(0);
-	m_sliderSubdiv->setRange(0, 6);
-	m_sliderSubdiv->setValue(m_subdivisions);
+    // init sliders
+    m_sliderTheta ->setRange(0, 360);
+    m_sliderTheta ->setValue(0);
+    m_sliderSubdiv->setRange(0, 6);
+    m_sliderSubdiv->setValue(m_subdivisions);
 
-	// create spinBoxes
-	m_spinBoxTheta = new QSpinBox;
-	m_spinBoxTheta->setRange(0, 360);
-	m_spinBoxTheta->setValue(0);
-	m_spinBoxSubdiv = new QSpinBox;
-	m_spinBoxSubdiv->setRange(0, 6);
-	m_spinBoxSubdiv->setValue(m_subdivisions);
+    // create spinBoxes
+    m_spinBoxTheta = new QSpinBox;
+    m_spinBoxTheta->setRange(0, 360);
+    m_spinBoxTheta->setValue(0);
+    m_spinBoxSubdiv = new QSpinBox;
+    m_spinBoxSubdiv->setRange(0, 6);
+    m_spinBoxSubdiv->setValue(m_subdivisions);
 
-	// init checkbox
-	m_checkBoxTwist = new QCheckBox("Twist");
-	m_checkBoxTwist->setChecked(m_twist);
+    // init checkbox
+    m_checkBoxTwist = new QCheckBox("Twist");
+    m_checkBoxTwist->setChecked(m_twist);
 
-	// layout for assembling widgets
-	QGridLayout *layout = new QGridLayout;
-	layout->addWidget(label[0],	   0, 0);
-	layout->addWidget(m_sliderTheta,   0, 1);
-	layout->addWidget(m_spinBoxTheta,  0, 2);
-	layout->addWidget(label[1],	   1, 0);
-	layout->addWidget(m_sliderSubdiv,  1, 1);
-	layout->addWidget(m_spinBoxSubdiv, 1, 2);
-	layout->addWidget(m_checkBoxTwist, 2, 0);
+    // layout for assembling widgets
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(label[0],    0, 0);
+    layout->addWidget(m_sliderTheta,   0, 1);
+    layout->addWidget(m_spinBoxTheta,  0, 2);
+    layout->addWidget(label[1],    1, 0);
+    layout->addWidget(m_sliderSubdiv,  1, 1);
+    layout->addWidget(m_spinBoxSubdiv, 1, 2);
+    layout->addWidget(m_checkBoxTwist, 2, 0);
 
-	// assign layout to group box
-	groupBox->setLayout(layout);
+    // assign layout to group box
+    groupBox->setLayout(layout);
 
-	// init signal/slot connections
-	connect(m_sliderTheta  , SIGNAL(valueChanged(int)), this, SLOT(changeTheta (int)));
-	connect(m_sliderSubdiv , SIGNAL(valueChanged(int)), this, SLOT(changeSubdiv(int)));
-	connect(m_spinBoxTheta,  SIGNAL(valueChanged(int)), this, SLOT(changeTheta (int)));
-	connect(m_spinBoxSubdiv, SIGNAL(valueChanged(int)), this, SLOT(changeSubdiv(int)));
-	connect(m_checkBoxTwist, SIGNAL(stateChanged(int)), this, SLOT(changeTwist (int)));
+    // init signal/slot connections
+    connect(m_sliderTheta  , SIGNAL(valueChanged(int)), this, SLOT(changeTheta (int)));
+    connect(m_sliderSubdiv , SIGNAL(valueChanged(int)), this, SLOT(changeSubdiv(int)));
+    connect(m_spinBoxTheta,  SIGNAL(valueChanged(int)), this, SLOT(changeTheta (int)));
+    connect(m_spinBoxSubdiv, SIGNAL(valueChanged(int)), this, SLOT(changeSubdiv(int)));
+    connect(m_checkBoxTwist, SIGNAL(stateChanged(int)), this, SLOT(changeTwist (int)));
 
-	return(groupBox);
+    return(groupBox);
 }
 
 
@@ -144,34 +183,34 @@ HW1b::controlPanel()
 void
 HW1b::reset()
 {
-	// reset parameters
-	m_theta		= 0;
-	m_subdivisions	= 4;
-	m_updateColor	= true;
-	m_twist		= true;
-	m_sliderTheta->blockSignals(true);
-	m_sliderTheta->setValue(0.0f);
-	m_sliderTheta->blockSignals(false);
+    // reset parameters
+    m_theta     = 0;
+    m_subdivisions  = 4;
+    m_updateColor   = true;
+    m_twist     = true;
+    m_sliderTheta->blockSignals(true);
+    m_sliderTheta->setValue(0.0f);
+    m_sliderTheta->blockSignals(false);
 
-	m_spinBoxTheta->blockSignals(true);
-	m_spinBoxTheta->setValue(0.0f);
-	m_spinBoxTheta->blockSignals(false);
-	m_sliderSubdiv->blockSignals(true);
-	m_sliderSubdiv->setValue(m_subdivisions);
-	m_sliderSubdiv->blockSignals(false);
+    m_spinBoxTheta->blockSignals(true);
+    m_spinBoxTheta->setValue(0.0f);
+    m_spinBoxTheta->blockSignals(false);
+    m_sliderSubdiv->blockSignals(true);
+    m_sliderSubdiv->setValue(m_subdivisions);
+    m_sliderSubdiv->blockSignals(false);
 
-	m_spinBoxSubdiv->blockSignals(true);
-	m_spinBoxSubdiv->setValue(m_subdivisions);
-	m_spinBoxSubdiv->blockSignals(false);
+    m_spinBoxSubdiv->blockSignals(true);
+    m_spinBoxSubdiv->setValue(m_subdivisions);
+    m_spinBoxSubdiv->blockSignals(false);
 
-	// reset twist checkbox
-	m_checkBoxTwist->setChecked(m_twist);
+    // reset twist checkbox
+    m_checkBoxTwist->setChecked(m_twist);
 
-	// redraw
-	m_points.clear();
-	m_colors.clear();
-	initBuffers();
-	updateGL();
+    // redraw
+    m_points.clear();
+    m_colors.clear();
+    initBuffers();
+    updateGL();
 }
 
 
@@ -184,15 +223,15 @@ HW1b::reset()
 void
 HW1b::initBuffers()
 {
-	const QVector2D vertices[] = {
-		 QVector2D( 0.0f ,  0.75f),
-		 QVector2D( 0.65f, -0.375f),
-		 QVector2D(-0.65f, -0.375f)
-	};
+    const QVector2D vertices[] = {
+         QVector2D( 0.0f ,  0.75f),
+         QVector2D( 0.65f, -0.375f),
+         QVector2D(-0.65f, -0.375f)
+    };
 
-	// recursively subdivide triangle into triangular facets;
-	// store vertex positions and colors in m_points and m_colors, respectively
-	divideTriangle(vertices[0], vertices[1], vertices[2], m_subdivisions);
+    // recursively subdivide triangle into triangular facets;
+    // store vertex positions and colors in m_points and m_colors, respectively
+    divideTriangle(vertices[0], vertices[1], vertices[2], m_subdivisions);
 }
 
 
@@ -205,7 +244,22 @@ HW1b::initBuffers()
 void
 HW1b::divideTriangle(vec2 a, vec2 b, vec2 c, int count)
 {
-	// PUT YOUR CODE HERE
+    // PUT YOUR CODE HERE
+    if (count > 0)
+    {
+        vec2 ab = vec2( (a[0]+b[0])/2 , (a[1]+b[1])/2 );
+        vec2 bc = vec2( (b[0]+c[0])/2 , (b[1]+c[1])/2 );
+        vec2 ca = vec2( (c[0]+a[0])/2 , (c[1]+a[1])/2 );
+
+
+        divideTriangle(a, ab, ca, count -1);
+        divideTriangle(b, ab, bc, count -1);
+        divideTriangle(c, bc, ca, count -1);
+        divideTriangle(ab, bc, ca, count -1);
+    }
+    else {
+        triangle(a, b, c);
+    }
 }
 
 
@@ -218,17 +272,17 @@ HW1b::divideTriangle(vec2 a, vec2 b, vec2 c, int count)
 void
 HW1b::triangle(vec2 a, vec2 b, vec2 c)
 {
-	// init color
-	if(m_updateColor) {
-		m_colors.push_back(vec3((float) rand()/RAND_MAX,
-					(float) rand()/RAND_MAX,
-					(float) rand()/RAND_MAX));
-	}
+    // init color
+    if(m_updateColor) {
+        m_colors.push_back(vec3((float) rand()/RAND_MAX,
+                    (float) rand()/RAND_MAX,
+                    (float) rand()/RAND_MAX));
+    }
 
-	// init geometry
-	m_points.push_back(rotTwist(a));
-	m_points.push_back(rotTwist(b));
-	m_points.push_back(rotTwist(c));
+    // init geometry
+    m_points.push_back(rotTwist(a));
+    m_points.push_back(rotTwist(b));
+    m_points.push_back(rotTwist(c));
 }
 
 
@@ -241,10 +295,10 @@ HW1b::triangle(vec2 a, vec2 b, vec2 c)
 vec2
 HW1b::rotTwist(vec2 p)
 {
-	float d = m_twist ? sqrt(p[0]*p[0] + p[1]*p[1]) : 1;
-	float sinTheta = sin(d*m_theta);
-	float cosTheta = cos(d*m_theta);
-	return vec2(p[0]*cosTheta - p[1]*sinTheta, p[0]*sinTheta + p[1]*cosTheta);
+    float d = m_twist ? sqrt(p[0]*p[0] + p[1]*p[1]) : 1;
+    float sinTheta = sin(d*m_theta);
+    float cosTheta = cos(d*m_theta);
+    return vec2(p[0]*cosTheta - p[1]*sinTheta, p[0]*sinTheta + p[1]*cosTheta);
 }
 
 
@@ -257,23 +311,23 @@ HW1b::rotTwist(vec2 p)
 void
 HW1b::changeTheta(int angle)
 {
-	// update slider and spinbox
-	m_sliderTheta->blockSignals(true);
-	m_sliderTheta->setValue(angle);
-	m_sliderTheta->blockSignals(false);
+    // update slider and spinbox
+    m_sliderTheta->blockSignals(true);
+    m_sliderTheta->setValue(angle);
+    m_sliderTheta->blockSignals(false);
 
-	m_spinBoxTheta->blockSignals(true);
-	m_spinBoxTheta->setValue(angle);
-	m_spinBoxTheta->blockSignals(false);
+    m_spinBoxTheta->blockSignals(true);
+    m_spinBoxTheta->setValue(angle);
+    m_spinBoxTheta->blockSignals(false);
 
-	// init vars
-	m_theta = angle * (M_PI / 180.);	// convert angle to radians
-	m_updateColor = 0;			// do not update color during rotation
+    // init vars
+    m_theta = angle * (M_PI / 180.);    // convert angle to radians
+    m_updateColor = 0;          // do not update color during rotation
 
-	// redraw
-	m_points.clear();
-	initBuffers();
-	updateGL();
+    // redraw
+    m_points.clear();
+    initBuffers();
+    updateGL();
 }
 
 
@@ -286,24 +340,24 @@ HW1b::changeTheta(int angle)
 void
 HW1b::changeSubdiv(int subdivisions)
 {
-	// update slider and spinbox
-	m_sliderSubdiv->blockSignals(true);
-	m_sliderSubdiv->setValue(subdivisions);
-	m_sliderSubdiv->blockSignals(false);
+    // update slider and spinbox
+    m_sliderSubdiv->blockSignals(true);
+    m_sliderSubdiv->setValue(subdivisions);
+    m_sliderSubdiv->blockSignals(false);
 
-	m_spinBoxSubdiv->blockSignals(true);
-	m_spinBoxSubdiv->setValue(subdivisions);
-	m_spinBoxSubdiv->blockSignals(false);
+    m_spinBoxSubdiv->blockSignals(true);
+    m_spinBoxSubdiv->setValue(subdivisions);
+    m_spinBoxSubdiv->blockSignals(false);
 
-	// init vars
-	m_subdivisions = subdivisions;
-	m_updateColor  = 1;
+    // init vars
+    m_subdivisions = subdivisions;
+    m_updateColor  = 1;
 
-	// redraw
-	m_points.clear();
-	m_colors.clear();
-	initBuffers();
-	updateGL();
+    // redraw
+    m_points.clear();
+    m_colors.clear();
+    initBuffers();
+    updateGL();
 }
 
 
@@ -316,12 +370,13 @@ HW1b::changeSubdiv(int subdivisions)
 void
 HW1b::changeTwist(int twist)
 {
-	// init vars
-	m_twist = twist;
-	m_updateColor = 0;
+    // init vars
+    m_twist = twist;
+    m_updateColor = 0;
 
-	// redraw
-	m_points.clear();
-	initBuffers();
-	updateGL();
+    // redraw
+    m_points.clear();
+    initBuffers();
+    updateGL();
 }
+
