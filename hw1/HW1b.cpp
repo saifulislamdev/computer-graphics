@@ -55,7 +55,7 @@ HW1b::initializeGL()
 void
 HW1b::resizeGL(int w, int h)
 {
-	// PUT YOUR CODE HERE -ziyi
+	// PUT YOUR CODE HERE
 
 	// assign private member m_winW and m_winH to the windows w and h
 	m_winW = w;
@@ -93,7 +93,7 @@ HW1b::resizeGL(int w, int h)
 void
 HW1b::paintGL()
 {
-	// PUT YOUR CODE HERE -ziyi
+	// PUT YOUR CODE HERE
 
 	// clear canvas with background values
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -243,7 +243,7 @@ HW1b::initBuffers()
 void
 HW1b::divideTriangle(vec2 a, vec2 b, vec2 c, int count)
 {
-	// PUT YOUR CODE HERE -ziyi
+	// PUT YOUR CODE HERE
 	if (count > 0) {
 		vec2 ab = vec2((a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0);
 		vec2 ac = vec2((a[0] + c[0]) / 2.0, (a[1] + c[1]) / 2.0);
