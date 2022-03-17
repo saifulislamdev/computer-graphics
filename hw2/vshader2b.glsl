@@ -13,4 +13,7 @@ uniform	int	u_Twist;	// Twist flag
 void main() 
 {
 	// PUT YOUR CODE HERE
+	// TODO: u_Theta, u_Twist, a_Color
+	gl_Position = u_Projection * u_Modelview * vec4(a_Position, 0, 1);
+	v_Color = vec4(1.0, 1.0, 0.0, 1.0);
 }

@@ -74,6 +74,35 @@ void
 HW2b::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE HERE
+
+	// TODO: include twist and theta in shaders
+
+	// save window dimensions
+	m_winW = w;
+	m_winH = h;
+
+	// compute aspect ratio
+	float xmax, ymax;
+	float ar = (float)w / h;
+	if (ar > 1.0)
+	{ // wide screen
+		xmax = ar;
+		ymax = 1.;
+	}
+	else
+	{ // tall screen
+		xmax = 1.;
+		ymax = 1 / ar;
+	}
+
+	// set viewport to occupy full canvas
+	glViewport(0, 0, w, h);
+
+	// compute orthographic projection from viewing coordinates;
+	// we use Qt's 4x4 matrix class in place of legacy OpenGL code
+	// init viewing coordinates for orthographic projection
+	m_projection.setToIdentity();
+	m_projection.ortho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
 }
 
 
@@ -87,6 +116,22 @@ void
 HW2b::paintGL()
 {
 	// PUT YOUR CODE HERE
+
+	// clear canvas with background color
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// use glsl program
+	glUseProgram(m_program[HW2B].programId());
+
+	// pass the following parameters to vertex the shader:
+	// projection matrix, modelview matrix, and "reverse" flag
+	glUniformMatrix4fv(m_uniform[HW2B][PROJ], 1, GL_FALSE, m_projection.constData());
+	glUniformMatrix4fv(m_uniform[HW2B][MV], 1, GL_FALSE, m_modelview.constData());
+
+	glDrawArrays(GL_POINTS, 0, 1);
+
+	// terminate program; rendering is done
+	glUseProgram(0);
 }
 
 
@@ -266,6 +311,16 @@ void
 HW2b::divideTriangle(vec2 a, vec2 b, vec2 c, int count)
 {
 	// PUT YOUR CODE HERE
+	if (count > 0) {
+		vec2 ab = vec2((a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0);
+		vec2 ac = vec2((a[0] + c[0]) / 2.0, (a[1] + c[1]) / 2.0);
+		vec2 bc = vec2((b[0] + c[0]) / 2.0, (b[1] + c[1]) / 2.0);
+		divideTriangle(a, ab, ac, count - 1);
+		divideTriangle(b, bc, ab, count - 1);
+		divideTriangle(c, ac, bc, count - 1);
+		divideTriangle(ab, ac, bc, count - 1);
+	}
+	else triangle(a, b, c);
 }
 
 
