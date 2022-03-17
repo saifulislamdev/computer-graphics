@@ -74,6 +74,24 @@ void
 HW2b::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE HERE
+	// save window dimensions
+    m_winW = w;
+    m_winH = h;
+
+    // compute aspect ratio
+    float xmax, ymax;
+    float ar = (float) w / h;
+        if(ar > 1.0) {      // wide screen
+            xmax = ar;
+            ymax = 1.;
+        } else {        // tall screen
+            xmax = 1.;
+            ymax = 1/ar;
+        }
+
+   glViewport(0, 0, w, h);
+   m_projection.setToIdentity();
+   m_projection.ortho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
 }
 
 
@@ -87,6 +105,27 @@ void
 HW2b::paintGL()
 {
 	// PUT YOUR CODE HERE
+// clear canvas with background color
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Enable shader program
+	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
+	// Use GLSL shader program
+	glUseProgram(m_program[HW2B].programId());
+
+	// pass MV, PROJ, THETA, SUBDIV, TWIST parameters to the vertex shader:
+
+	glUniformMatrix4fv(m_uniform[HW2B][MV], 1, GL_FALSE, m_modelview.constData());
+	glUniformMatrix4fv(m_uniform[HW2B][PROJ], 1, GL_FALSE, m_projection.constData());
+	glUniform1f(m_uniform[HW2B][THETA], m_theta);
+	glUniform1i(m_uniform[HW2B][TWIST], m_twist);
+
+	// Draw triangles
+	glDrawArrays(GL_TRIANGLES, 0, m_numPoints);
+
+	// Disable shader program
+	glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
 }
 
 
@@ -266,6 +305,22 @@ void
 HW2b::divideTriangle(vec2 a, vec2 b, vec2 c, int count)
 {
 	// PUT YOUR CODE HERE
+	//same as 1b 
+	if (count > 0)
+    {
+        vec2 ab = vec2( (a[0]+b[0])/2 , (a[1]+b[1])/2 );
+        vec2 bc = vec2( (b[0]+c[0])/2 , (b[1]+c[1])/2 );
+        vec2 ca = vec2( (c[0]+a[0])/2 , (c[1]+a[1])/2 );
+
+
+        divideTriangle(a, ab, ca, count -1);
+        divideTriangle(b, ab, bc, count -1);
+        divideTriangle(c, bc, ca, count -1);
+        divideTriangle(ab, bc, ca, count -1);
+    }
+    else {
+        triangle(a, b, c);
+    }
 }
 
 
