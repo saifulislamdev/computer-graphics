@@ -6,4 +6,6 @@ out vec4 fragColor;
 void main() 
 {
 	// PUT YOUR CODE HERE
+
+	fragColor = v_Color;
 }

@@ -72,6 +72,29 @@ void
 HW2a::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE HERE
+
+	// assign private member m_winW and m_winH to the windows w and h
+	m_winW = w;
+	m_winH = h;
+
+	// compute aspect ratio
+	float xmax, ymax;
+	float ar = (float)w / h;
+	if (ar > 1.0) {		// wide screen
+		xmax = ar;
+		ymax = 1.;
+	}
+	else {		// tall screen
+		xmax = 1.;
+		ymax = 1 / ar;
+	}
+
+	// set viewport to occupy full canvas
+	glViewport(0, 0, w, h);
+
+	// compute orthographic projection from viewing coordinates;
+	m_projection.setToIdentity();
+	m_projection.ortho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
 }
 
 
@@ -112,6 +135,29 @@ HW2a::paintGL()
 
 	// use glsl program
 	// PUT YOUR CODE HERE
+
+	glUseProgram(m_program[HW2A].programId());
+
+	// pass the projection matrix to the vertex shader
+	glUniformMatrix4fv(m_uniform[HW2A][PROJ], 1, GL_FALSE, m_projection.constData());
+
+	int drawModeCursor = 0;
+
+	// iterate through a 3x3 matrix from left to right, bottom to top
+	for (int row = 0; row < 3; row++)
+	{
+		for (int col = 0; col < 3; col++)
+		{
+			// set the view port for each P
+			glViewport(col*w, row*h, w, h);
+
+			// draw the object
+			glDrawArrays(DrawModes[drawModeCursor++], 0, m_vertNum); // strating index is 0, count is m_vertNum
+		}
+	}
+
+	// it means that no program is current, and therefore no program will be used for things that use programs.
+	glUseProgram(0);
 
 	// disable vertex shader point size adjustment
 	glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);

@@ -74,6 +74,29 @@ void
 HW2b::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE HERE
+
+	// assign private member m_winW and m_winH to the windows w and h
+	m_winW = w;
+	m_winH = h;
+
+	// compute aspect ratio
+	float xmax, ymax;
+	float ar = (float)w / h;
+	if (ar > 1.0) {		// wide screen
+		xmax = ar;
+		ymax = 1.;
+	}
+	else {		// tall screen
+		xmax = 1.;
+		ymax = 1 / ar;
+	}
+
+	// set viewport to occupy full canvas
+	glViewport(0, 0, w, h);
+
+	// init viewing coordinates for orthographic projection
+	m_projection.setToIdentity();
+	m_projection.ortho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
 }
 
 
@@ -87,6 +110,39 @@ void
 HW2b::paintGL()
 {
 	// PUT YOUR CODE HERE
+
+	// clear canvas with background color
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// bind vertex buffer to the GPU; enable buffer to be accessed
+	// via the attribute vertex variable and specify data format
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glEnableVertexAttribArray(ATTRIB_VERTEX);
+	glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, NULL);
+
+	// bind color buffer to the GPU; enable buffer to be accessed
+	// via the attribute color variable and specify data format
+	glBindBuffer(GL_ARRAY_BUFFER, m_colorBuffer);
+	glEnableVertexAttribArray(ATTRIB_COLOR);
+	glVertexAttribPointer(ATTRIB_COLOR, 3, GL_FLOAT, false, 0, NULL);
+
+	// use glsl progam
+	glUseProgram(m_program[HW2B].programId());
+
+	// pass the following parameters to vertex the shader:
+	// projection matrix, modelview matrix, Twist flag, Theta parameter
+	glUniformMatrix4fv(m_uniform[HW2B][PROJ], 1, GL_FALSE, m_projection.constData()); // projection matrix
+	glUniformMatrix4fv(m_uniform[HW2B][MV], 1, GL_FALSE, m_modelview.constData()); // modelview matrix
+	glUniform1f(m_uniform[HW2B][THETA], m_theta); // Theta parameter, for float
+	glUniform1i(m_uniform[HW2B][TWIST], m_twist); // Twist flag, for int 
+
+	// draw triangles
+	glDrawArrays(GL_TRIANGLES, 0, m_numPoints);
+
+	// terminate program; rendering is done
+	glUseProgram(0);
+	glDisableVertexAttribArray(ATTRIB_COLOR);
+	glDisableVertexAttribArray(ATTRIB_VERTEX);
 }
 
 
@@ -242,6 +298,12 @@ HW2b::initVertexBuffer()
 	divideTriangle(vertices[0], vertices[1], vertices[2], m_subdivisions);
 	m_numPoints = (int) m_points.size();		// save number of vertices
 
+	/* CODE ADDED BY STUDENT */
+	// create vertex and color buffers
+	glGenBuffers(1, &m_vertexBuffer);
+	glGenBuffers(1, &m_colorBuffer);
+	/* CODE ADDED BY STUDENT */
+
 	// bind vertex buffer to the GPU and copy the vertices from CPU to GPU
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec2), &m_points[0], GL_STATIC_DRAW);
@@ -266,6 +328,28 @@ void
 HW2b::divideTriangle(vec2 a, vec2 b, vec2 c, int count)
 {
 	// PUT YOUR CODE HERE
+
+	// count was initialized as m_subdivisions and will end when count == 0
+	if (count == 0) {
+		triangle(a, b, c);
+	}
+	else {
+		// Get midpoints of each vertex for the subdivision
+		vec2 ab = vec2((a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0);
+		vec2 ac = vec2((a[0] + c[0]) / 2.0, (a[1] + b[1]) / 2.0);
+		vec2 bc = vec2((b[0] + c[0]) / 2.0, (b[1] + c[1]) / 2.0);
+
+		// Subdivide triangle from vertices of original/bigger triangle
+		int newCount = count - 1;
+		divideTriangle(a, ab, ac, newCount);
+		divideTriangle(ab, b, bc, newCount);
+		divideTriangle(ac, bc, c, newCount);
+
+		// Subdivide center/middle triangle
+		// Order of vertices are correspondent with the positions of a, b, c of
+		// original/bigger triangle but upside down.
+		divideTriangle(bc, ab, ac, newCount);
+	}
 }
 
 
