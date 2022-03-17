@@ -75,8 +75,6 @@ HW2b::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE HERE
 
-	// TODO: include twist and theta in shaders
-
 	// save window dimensions
 	m_winW = w;
 	m_winH = h;
@@ -120,6 +118,18 @@ HW2b::paintGL()
 	// clear canvas with background color
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	// bind vertex buffer to the GPU; enable buffer to be accessed
+	// via the attribute vertex variable and specify data format
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glEnableVertexAttribArray(ATTRIB_VERTEX);
+	glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, NULL);
+
+	// bind color buffer to the GPU; enable buffer to be accessed
+	// via the attribute color variable and specify data format
+	glBindBuffer(GL_ARRAY_BUFFER, m_colorBuffer);
+	glEnableVertexAttribArray(ATTRIB_COLOR);
+	glVertexAttribPointer(ATTRIB_COLOR, 3, GL_FLOAT, false, 0, NULL);
+
 	// use glsl program
 	glUseProgram(m_program[HW2B].programId());
 
@@ -127,11 +137,15 @@ HW2b::paintGL()
 	// projection matrix, modelview matrix, and "reverse" flag
 	glUniformMatrix4fv(m_uniform[HW2B][PROJ], 1, GL_FALSE, m_projection.constData());
 	glUniformMatrix4fv(m_uniform[HW2B][MV], 1, GL_FALSE, m_modelview.constData());
+	glUniform1f(m_uniform[HW2B][THETA], m_theta);
+	glUniform1i(m_uniform[HW2B][TWIST], m_twist); 
 
-	glDrawArrays(GL_POINTS, 0, 1);
+	glDrawArrays(GL_TRIANGLES, 0, m_numPoints);
 
 	// terminate program; rendering is done
 	glUseProgram(0);
+	glDisableVertexAttribArray(ATTRIB_COLOR);
+	glDisableVertexAttribArray(ATTRIB_VERTEX);
 }
 
 
@@ -286,7 +300,13 @@ HW2b::initVertexBuffer()
 	// store vertex positions and colors in m_points and m_colors, respectively
 	divideTriangle(vertices[0], vertices[1], vertices[2], m_subdivisions);
 	m_numPoints = (int) m_points.size();		// save number of vertices
-
+	
+	// CODE ADDED HERE
+	// create vertex and color buffers
+	glGenBuffers(1, &m_vertexBuffer);
+	glGenBuffers(1, &m_colorBuffer);
+	// END CODE ADDED HERE
+	
 	// bind vertex buffer to the GPU and copy the vertices from CPU to GPU
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec2), &m_points[0], GL_STATIC_DRAW);
