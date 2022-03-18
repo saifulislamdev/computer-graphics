@@ -134,12 +134,12 @@ HW2b::paintGL()
 	glUseProgram(m_program[HW2B].programId());
 
 	// pass the following parameters to vertex the shader:
-	// projection matrix, modelview matrix, and "reverse" flag
-	glUniformMatrix4fv(m_uniform[HW2B][PROJ], 1, GL_FALSE, m_projection.constData());
-	glUniformMatrix4fv(m_uniform[HW2B][MV], 1, GL_FALSE, m_modelview.constData());
-	glUniform1f(m_uniform[HW2B][THETA], m_theta);
-	glUniform1i(m_uniform[HW2B][TWIST], m_twist); 
+	glUniformMatrix4fv(m_uniform[HW2B][PROJ], 1, GL_FALSE, m_projection.constData()); // projection matrix
+	glUniformMatrix4fv(m_uniform[HW2B][MV], 1, GL_FALSE, m_modelview.constData()); // model view matrix
+	glUniform1f(m_uniform[HW2B][THETA], m_theta); // theta (float)
+	glUniform1i(m_uniform[HW2B][TWIST], m_twist); // twist flag (int)
 
+	// draw triangles
 	glDrawArrays(GL_TRIANGLES, 0, m_numPoints);
 
 	// terminate program; rendering is done
@@ -301,7 +301,7 @@ HW2b::initVertexBuffer()
 	divideTriangle(vertices[0], vertices[1], vertices[2], m_subdivisions);
 	m_numPoints = (int) m_points.size();		// save number of vertices
 	
-	// CODE ADDED HERE
+	// CODE ADDED HERE BY STUDENT
 	// create vertex and color buffers
 	glGenBuffers(1, &m_vertexBuffer);
 	glGenBuffers(1, &m_colorBuffer);
@@ -331,14 +331,22 @@ void
 HW2b::divideTriangle(vec2 a, vec2 b, vec2 c, int count)
 {
 	// PUT YOUR CODE HERE
+
+	// count was initialized as m_subdivisions and will end when count == 0
 	if (count > 0) {
+		// Get midpoints of each vertex for the subdivision
 		vec2 ab = vec2((a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0);
 		vec2 ac = vec2((a[0] + c[0]) / 2.0, (a[1] + c[1]) / 2.0);
 		vec2 bc = vec2((b[0] + c[0]) / 2.0, (b[1] + c[1]) / 2.0);
-		divideTriangle(a, ab, ac, count - 1);
-		divideTriangle(b, bc, ab, count - 1);
-		divideTriangle(c, ac, bc, count - 1);
-		divideTriangle(ab, ac, bc, count - 1);
+
+		// Subdivide triangle from vertices of original/bigger triangle
+		int newCount = count - 1;
+		divideTriangle(a, ab, ac, newCount);
+		divideTriangle(ab, b, bc, newCount);
+		divideTriangle(ac, bc, c, newCount);
+
+		// Subdivide center/middle triangle
+		divideTriangle(ab, ac, bc, newCount);
 	}
 	else triangle(a, b, c);
 }
