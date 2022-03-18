@@ -13,4 +13,17 @@ uniform	int	u_Twist;	// Twist flag
 void main() 
 {
 	// PUT YOUR CODE HERE
+
+	// set position based on theta, twist, and projection and model view matrices
+	if(u_Twist == 0) {
+		gl_Position = u_Projection * u_Modelview * vec4(a_Position, 0, 1);
+	} else {
+		float x = a_Position.x;
+		float y = a_Position.y;
+		float t = sqrt(x*x + y*y) * u_Theta;
+		gl_Position = u_Projection * vec4(x*cos(t)-y*sin(t), x*sin(t)+y*cos(t), 0, 1);
+	}
+
+	// set color
+	v_Color = vec4(a_Color, 1.0);
 }
