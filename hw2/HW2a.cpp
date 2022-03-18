@@ -43,7 +43,7 @@ HW2a::HW2a(const QGLFormat &glf, QWidget *parent) : HW(glf, parent)
 // Initialization routine before display loop.
 // Gets called once before the first time resizeGL() or paintGL() is called.
 //
-void
+void 
 HW2a::initializeGL()
 {
 	// initialize GL function resolution for current context
@@ -72,9 +72,34 @@ void
 HW2a::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE HERE
+
+	// save window dimensions
+	m_winW = w;
+	m_winH = h;
+
+	// compute aspect ratio
+	float xmax, ymax;
+	float ar = (float)w / h;
+	if (ar > 1.0)
+	{ // wide screen
+		xmax = ar;
+		ymax = 1.;
+	}
+	else
+	{ // tall screen
+		xmax = 1.;
+		ymax = 1 / ar;
+	}
+
+	// set viewport to occupy full canvas
+	glViewport(0, 0, w, h);
+
+	// compute orthographic projection from viewing coordinates;
+	// we use Qt's 4x4 matrix class in place of legacy OpenGL code
+	// init viewing coordinates for orthographic projection
+	m_projection.setToIdentity();
+	m_projection.ortho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
 }
-
-
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // HW2a::paintGL:
@@ -86,7 +111,7 @@ HW2a::paintGL()
 {
 	// clear canvas with background color
 	glClear(GL_COLOR_BUFFER_BIT);
-	
+
 	// enable vertex shader point size adjustment
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
@@ -107,11 +132,33 @@ HW2a::paintGL()
 	// ********************
 
 	// viewport dimensions
-	int w = m_winW / 3;
-	int h = m_winH / 3;
+	int totalRows = 3;
+	int totalCols = 3;
+	int w = m_winW / totalCols;
+	int h = m_winH / totalRows;
 
 	// use glsl program
 	// PUT YOUR CODE HERE
+	glUseProgram(m_program[HW2A].programId());
+
+	// pass the projection matrix to vertex the shader
+	glUniformMatrix4fv(m_uniform[HW2A][PROJ], 1, GL_FALSE, m_projection.constData());
+
+	// iterate through a 3x3 matrix from left to right, bottom to top
+	for (int row = 0; row < totalRows; row++)
+	{
+		for (int col = 0; col < totalCols; col++) 
+		{
+			// set the view port for each P
+			glViewport(col*w, row*h, w, h);
+
+			// draw the object
+			glDrawArrays(DrawModes[row*totalCols + col], 0, m_vertNum);
+		}
+	}
+	
+	// terminate program; rendering is done
+	glUseProgram(0);
 
 	// disable vertex shader point size adjustment
 	glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -175,22 +222,22 @@ void
 HW2a::initVertexBuffer()
 {
 	float vv[] = {
-	        -0.5 , -0.75,
-	        -0.5 , -0.5 ,
-	        -0.5 , -0.25,
-	        -0.5 ,  0.0 ,
-	        -0.5 ,  0.25,
-	        -0.5 ,  0.5 ,
-	        -0.25,  0.75,
-	         0.0 ,  0.75,
-	         0.25,  0.75,
-	         0.5 ,  0.75,
-	         0.75 , 0.5 ,
-	         0.75,  0.25,
-	         0.5 ,  0.0 ,
-	         0.25,  0.0 ,
-	         0.0,   0.0 ,
-	        -0.25,  0.0 
+		-0.5 , -0.75,
+		-0.5 , -0.5 ,
+		-0.5 , -0.25,
+		-0.5 ,  0.0 ,
+		-0.5 ,  0.25,
+		-0.5 ,  0.5 ,
+		-0.25,  0.75,
+		 0.0 ,  0.75,
+		 0.25,  0.75,
+		 0.5 ,  0.75,
+		 0.75 , 0.5 ,
+		 0.75,  0.25,
+		 0.5 ,  0.0 ,
+		 0.25,  0.0 ,
+		 0.0,   0.0 ,
+		-0.25,  0.0
 	};
 	std::vector<float> v (&vv[0], &vv[0]+sizeof(vv)/sizeof(float));
 
