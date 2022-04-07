@@ -114,6 +114,8 @@ HW3b::resizeGL(int w, int h)
     m_winW = w;
     m_winH = h;
 
+    // compute aspect ratio
+	float ar = (float)w / h;
     // set viewport to occupy full canvas
     glViewport(0, 0, w, h);
 
@@ -389,12 +391,10 @@ HW3b::resetMesh()
 			case HOLE:
 				// PUT YOUR CODE HERE
 				vec.setZ(!((i > m_grid/3 && j > m_grid/3)&&(i < m_grid*2/3 && j < m_grid*2/3)) ? 0.5f : 0.0f);
-
 				break;
 			case DIAGONALWALL:
 				// PUT YOUR CODE HERE
 				vec.setZ((((m_grid-i)-j<3) && ((m_grid-i)-j>0)) ? 0.3f : 0.0);
-
 				break;
 			case SIDEWALL:
 				// PUT YOUR CODE HERE
@@ -403,28 +403,28 @@ HW3b::resetMesh()
 				break;
 			case DIAGONALBLOCK:
 				// PUT YOUR CODE HERE
-				vec.setZ((m_grid-i-j < 3) ? 0.3f : 0.0f);
+				vec.setZ((m_grid-i-j < 3) ? 0.5f : 0.0f);
 
 				break;
 			case MIDDLEBLOCK:
 				// PUT YOUR CODE HERE
-				vec.setZ(((i > m_grid/3 && j > m_grid/3)&&(i < m_grid*2/3 && j < m_grid*2/3)) ? 0.5f : 0.0f);
+				vec.setZ(((i > m_grid/3 && j > m_grid/3)&&(i < m_grid*2/3 && j < m_grid*2/3)) ? 0.5f: 0.0f);
 
 				break;
 			case CORNERBLOCK:
 				// PUT YOUR CODE HERE
-				vec.setZ(((i > m_grid*3/4 && j>m_grid* 3/4)) ? 0.5f : 0.0f);
+				vec.setZ(((i > m_grid*3/4 && j>m_grid* 3/4)) ? 0.5f: 0.0f);
 
 				break;
 			case HILL:
 				// PUT YOUR CODE HERE
-				vec.setZ(sin(3.14*((float)i/(float)m_grid))/4 +
-                         sin(3.14*((float)j/(float)m_grid))/4);
+				vec.setZ(sin(M_PI*((float)i/(float)m_grid))/3.0+
+                         sin(M_PI*((float)j/(float)m_grid))/3.0);
 				break;
 			case HILLFOUR:
 				// PUT YOUR CODE HERE
-				vec.setZ(sin(3.14*2 * ((float)i/(float)m_grid))/3 +
-                         sin(3.14*2 * ((float)j/(float)m_grid))/3);
+	            vec.setZ(sin(M_PI*2 * ((float)i/(float)m_grid))/3.0 +
+                         sin(M_PI*2 * ((float)j/(float)m_grid))/3.0);
 				break;
 		}
 	   }

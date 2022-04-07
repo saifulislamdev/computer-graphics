@@ -2,6 +2,7 @@
 
 // PUT YOUR CODE HERE
 out vec4 fragColor;
+
 void main() 
 {
 	// PUT YOUR CODE HERE
