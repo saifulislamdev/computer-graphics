@@ -374,18 +374,9 @@ HW3a::initVertexBuffer()
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec2), &m_points[0], GL_STATIC_DRAW);
 
-    // bind vertex buffer to the GPU; enable buffer to be accessed
-	// via the attribute vertex variable and specify data format
-    glEnableVertexAttribArray(ATTRIB_VERTEX);
-    glVertexAttribPointer	 (ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, 0);
-
     // bind texture coord buffer to the GPU and copy the texture coordinates from CPU to GPU
     glBindBuffer(GL_ARRAY_BUFFER, m_texBuffer);
     glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec2), &m_coords[0], GL_STATIC_DRAW);
-
-    // enable buffer to be copied to the attribute texture coord variable and specify data format
-    glEnableVertexAttribArray(ATTRIB_TEXCOORD);
-    glVertexAttribPointer	 (ATTRIB_TEXCOORD, 2, GL_FLOAT, false, 0, NULL);
 
 	m_points.clear();
     m_coords.clear();
