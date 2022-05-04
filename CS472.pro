@@ -15,7 +15,8 @@ HEADERS +=	hw0/HW0a.h	\
 		hw3/HW3a.h	\
 		hw3/HW3b.h	\
 		hw4/HW4a.h	\
-		hw4/HW4b.h
+		hw4/HW4b.h	\
+		hw4/HW4c.h
 
 		
 SOURCES +=	hw0/HW0a.cpp	\
@@ -29,5 +30,6 @@ SOURCES +=	hw0/HW0a.cpp	\
 		hw3/HW3a.cpp	\
 		hw3/HW3b.cpp	\
 		hw4/HW4a.cpp	\
-		hw4/HW4b.cpp
+		hw4/HW4b.cpp	\
+		hw4/HW4c.cpp
 

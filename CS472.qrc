@@ -22,12 +22,15 @@
 	<file>hw3/fshader3b4.glsl</file>
 	<file>hw3/vshader3b5.glsl</file>
 	<file>hw3/fshader3b5.glsl</file>
-	<file>hw4/vshader4b1.glsl</file>
-	<file>hw4/fshader4b1.glsl</file>
-	<file>hw4/vshader4b2.glsl</file>
-	<file>hw4/fshader4b2.glsl</file>
-	<file>hw4/vshader4b3.glsl</file>
-	<file>hw4/fshader4b3.glsl</file>
+	<file>hw4/vshader4c1.glsl</file>
+	<file>hw4/fshader4c1.glsl</file>
+	<file>hw4/vshader4c2.glsl</file>
+	<file>hw4/fshader4c2.glsl</file>
+	<file>hw4/vshader4c3.glsl</file>
+	<file>hw4/fshader4c3.glsl</file>
 	<file>mandrill.jpg</file>
+	<file>earth.jpg</file>
+	<file>sun.jpg</file>
+	<file>moon.jpg</file>
     </qresource>
 </RCC>

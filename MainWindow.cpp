@@ -21,6 +21,7 @@
 #include "hw3/HW3b.h"
 #include "hw4/HW4a.h"
 #include "hw4/HW4b.h"
+#include "hw4/HW4c.h"
 
 QString frameStyle   = "QFrame#frame {				\
 			border: 2px solid gray;			\
@@ -98,7 +99,7 @@ MainWindow::createWidgets()
 {
 	// create list of hw names; m_hwName name will be used for
 	// menu name and as key for class in m_hw container
-	m_hwName<< "Blank page"
+	m_hwName << "Blank page"
 		<< "0a: Square"
 		<< "0b: Aspect ratio"
 		<< "0c: GLSL"
@@ -109,14 +110,15 @@ MainWindow::createWidgets()
 		<< "2b: Triangle (GLSL)"
 		<< "3a: Triangle (Texture/Wire)"
 		<< "3b: Wave"
-		<< "4a: Bounce"
-		<< "4b: Shadow";
+		<< "4a: Transformation stack"
+		<< "4b: Bounce"
+		<< "4c: Shadow";
 
 	// format for legacy OpenGL with older GLSL (supporting attribute/varying qualifiers)
 	QGLFormat glfLegacy = QGLFormat::defaultFormat();	// base format
 	glfLegacy.setProfile(QGLFormat::CompatibilityProfile);	// also support legacy version
 	glfLegacy.setSampleBuffers(true);			// multisample buffer support for antialiasing (AA)
-	glfLegacy.setSamples(4);				// number of samples per fragment for AA
+	glfLegacy.setSamples(16);				// number of samples per fragment for AA
 	glfLegacy.setSwapInterval(0);
 	glfLegacy.setDefaultFormat(glfLegacy);			// use modified parameters
 
@@ -125,7 +127,7 @@ MainWindow::createWidgets()
 	glfModern.setVersion(3, 3);				// Mac requires 3.3+ for core profile
 	glfModern.setProfile(QGLFormat::CoreProfile);		// don't use deprecated functions
 	glfModern.setSampleBuffers(true);			// multisample buffer support for antialiasing (AA)
-	glfModern.setSamples(4);				// number of samples per fragment (for AA)
+	glfModern.setSamples(16);				// number of samples per fragment (for AA)
 	glfModern.setSwapInterval(0);
 	glfModern.setDefaultFormat(glfModern);			// use modified parameters
 
@@ -141,8 +143,9 @@ MainWindow::createWidgets()
 	m_hw[m_hwName[HW2B ]] = new HW2b (glfModern);
 	m_hw[m_hwName[HW3A ]] = new HW3a (glfModern);
 	m_hw[m_hwName[HW3B ]] = new HW3b (glfModern);
-	m_hw[m_hwName[HW4A ]] = new HW4a (glfLegacy);
-	m_hw[m_hwName[HW4B ]] = new HW4b (glfModern);
+	m_hw[m_hwName[HW4A ]] = new HW4a (glfModern);
+	m_hw[m_hwName[HW4B ]] = new HW4b (glfLegacy);
+	m_hw[m_hwName[HW4C ]] = new HW4c (glfModern);
 
 	// add control panels to stacked widget
 	for(int i = 0; i < (int) m_hwName.size(); ++i)
@@ -210,6 +213,8 @@ MainWindow::createActions()
 	m_actionHW4a->setData(HW4A);
 	m_actionHW4b = new QAction(m_hwName[HW4B], this);
 	m_actionHW4b->setData(HW4B);
+	m_actionHW4c = new QAction(m_hwName[HW4C], this);
+	m_actionHW4c->setData(HW4C);
 
 	// one signal-slot connection for all actions;
 	// execute() will resolve which action was triggered
@@ -252,6 +257,7 @@ MainWindow::createMenus()
 	m_menuHW4 = menuBar()->addMenu("HW4");
 	m_menuHW4->addAction(m_actionHW4a);
 	m_menuHW4->addAction(m_actionHW4b);
+	m_menuHW4->addAction(m_actionHW4c);
 }
 
 

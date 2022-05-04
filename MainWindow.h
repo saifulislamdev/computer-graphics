@@ -27,7 +27,7 @@
 #include <algorithm>
 #include "HW.h"
 
-enum {DUMMY, HW0A, HW0B, HW0C, HW0D, HW1A, HW1B, HW2A, HW2B, HW3A, HW3B, HW4A, HW4B};
+enum {DUMMY, HW0A, HW0B, HW0C, HW0D, HW1A, HW1B, HW2A, HW2B, HW3A, HW3B, HW4A, HW4B, HW4C};
 
 
 typedef std::map<QString, HW*> hw_type;
@@ -82,6 +82,7 @@ private:
 	QAction		*m_actionHW3b;
 	QAction		*m_actionHW4a;
 	QAction		*m_actionHW4b;
+	QAction		*m_actionHW4c;
 };
 
 extern MainWindow	*MainWindowP;

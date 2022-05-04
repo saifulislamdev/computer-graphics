@@ -91,7 +91,7 @@ void
 Light::display()
 {
 	// display light bulb as a sphere 
-	m_sphere->display();
+	m_sphere->display(1);
 	
 	// bind the buffer to the GPU; all future drawing calls gets data from this buffer
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
